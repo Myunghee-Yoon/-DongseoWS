@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>응용 생성형 AI 워크숍 인포그래픽</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Energetic & Playful -->
+    <!-- Application Structure Plan: 이 인포그래픽은 워크숍의 가치 제안을 시각적으로 전달하는 선형적인 내러티브 구조를 따릅니다. 사용자가 스크롤하면서 워크숍의 여정을 따라갈 수 있도록 설계되었습니다. 1) Hero 섹션에서 흥미를 유발하고, 2) 'AI Landscape'에서 차트를 통해 시장 현황 데이터를 보여주며, 3) 'Prompt Engineering'과 'Vibe Coding' 같은 핵심 개념을 시각적 다이어그램으로 설명합니다. 4) 'NotebookLM'의 장점을 명확히 비교하고, 5) 최종 프로젝트의 개발 과정을 타임라인으로 제시하여 워크숍의 실질적인 결과물을 강조합니다. 이 구조는 정보를 논리적 순서로 제공하여 복잡한 내용을 쉽게 소화하고 워크숍의 전체적인 가치를 이해시키기 위해 선택되었습니다. -->
+    <!-- Visualization & Content Choices: 
+        - AI 모델 시장 점유율 및 성장률: Data Point -> ChatGPT, Claude, Perplexity의 시장 점유율 및 성장률 데이터 -> Goal: Compare -> Chosen Visualization: 혼합 막대 차트 (Chart.js) -> Justification: 여러 모델의 두 가지 다른 메트릭(점유율, 성장률)을 하나의 차트에서 직관적으로 비교하여 시장의 동적인 변화를 효과적으로 보여줌. Library/Method: Chart.js/Canvas. CONFIRMING NO SVG.
+        - RAFT 프롬프트 기법: Data Point -> Role, Action, Format, Task 개념 -> Goal: Organize/Inform -> Chosen Visualization: 4개의 카드(Card)로 구성된 다이어그램 (HTML/CSS) -> Justification: 추상적인 프레임워크를 4개의 명확한 시각적 블록으로 분해하여 각 구성 요소의 의미를 쉽게 이해하고 기억할 수 있도록 함. Library/Method: HTML/CSS with Tailwind. CONFIRMING NO SVG.
+        - Grounded vs. Ungrounded AI: Data Point -> NotebookLM과 일반 챗봇의 차이점 -> Goal: Compare -> Chosen Visualization: 2열 비교 레이아웃 -> Justification: 두 AI 접근 방식의 핵심적인 차이(출처 기반 여부, 환각 현상)를 나란히 배치하여 장단점을 명확하게 대조함. Library/Method: HTML/CSS with Tailwind. CONFIRMING NO SVG.
+        - tldraw 'makereal' 프로세스: Data Point -> 스케치에서 코드로 변환되는 과정 -> Goal: Change/Organize -> Chosen Visualization: 3단계 수평 흐름도 (HTML/CSS) -> Justification: '스케치 → AI 변환 → 코드'의 변환 과정을 시각적인 순서도로 보여주어 '바이브 코딩'이라는 추상적 개념을 구체적인 시각적 경험으로 전달함. Library/Method: HTML/CSS with Tailwind. CONFIRMING NO SVG.
+        - 최종 프로젝트 개발 단계: Data Point -> '캠퍼스 행사 찾기' 앱 개발 6단계 프롬프트 -> Goal: Organize -> Chosen Visualization: 수직 타임라인 (HTML/CSS) -> Justification: 프로젝트 개발의 전체 과정을 단계별로 시각화하여 학생들이 워크숍을 통해 얻게 될 실질적인 결과물과 학습 경로를 명확하게 인지시킴. Library/Method: HTML/CSS with Tailwind. CONFIRMING NO SVG/Mermaid.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #F8F9FA;
+        }
+        .gradient-text {
+            background: linear-gradient(90deg, #118AB2, #06D6A0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .card {
+            background-color: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            transition: all 0.3s ease-in-out;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.15);
+        }
+        .tag {
+            background-color: #FFD166;
+            color: #073B4C;
+            font-weight: 700;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 400px;
+            max-height: 50vh;
+        }
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <div class="container mx-auto px-4 py-12 md:py-20">
+
+        <header class="text-center mb-16 md:mb-24">
+            <span class="inline-block px-4 py-1 text-sm rounded-full mb-4 tag">대학생을 위한 AI 역량 강화</span>
+            <h1 class="text-4xl md:text-6xl font-black mb-4">
+                <span class="gradient-text">응용 생성형 AI</span> 워크숍
+            </h1>
+            <p class="max-w-3xl mx-auto text-lg md:text-xl text-gray-600">
+                단순한 사용자에서 벗어나 AI와 협업하는 'AI 아키텍트'로 진화하세요. 기초 원리부터 실제 앱 개발까지, 당신의 미래를 바꿀 12시간의 여정이 시작됩니다.
+            </p>
+        </header>
+
+        <main class="space-y-16 md:space-y-24">
+            <section id="landscape">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-4">한눈에 보는 AI 모델 지형도</h2>
+                <p class="text-center max-w-2xl mx-auto text-gray-600 mb-12">ChatGPT가 시장을 지배하지만, Claude와 Perplexity 같은 전문 모델이 무섭게 성장하고 있습니다. 이 워크숍은 '최고의 AI'가 아닌 '내 과제에 최적의 AI'를 선택하는 전략적 안목을 길러줍니다.</p>
+                <div class="card">
+                    <div class="chart-container">
+                        <canvas id="marketChart"></canvas>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="prompting">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-4">AI와의 소통법, RAFT</h2>
+                <p class="text-center max-w-2xl mx-auto text-gray-600 mb-12">효과적인 프롬프트는 AI의 잠재력을 100% 끌어내는 열쇠입니다. RAFT 기법을 통해 AI에게 명확하고 구조적인 지시를 내리는 법을 배워보세요.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div class="card text-center border-t-4 border-[#FF6B6B]">
+                        <div class="text-5xl mb-4">👤</div>
+                        <h3 class="text-2xl font-bold mb-2">Role (역할)</h3>
+                        <p class="text-gray-600">AI에게 '데이터 과학자' 같은 특정 페르소나를 부여하여 답변의 관점과 톤을 설정합니다.</p>
+                    </div>
+                    <div class="card text-center border-t-4 border-[#FFD166]">
+                        <div class="text-5xl mb-4">⚙️</div>
+                        <h3 class="text-2xl font-bold mb-2">Action (행동)</h3>
+                        <p class="text-gray-600">'요약하라', '분류하라' 등 명확한 동사로 수행할 작업을 구체적으로 지시합니다.</p>
+                    </div>
+                    <div class="card text-center border-t-4 border-[#06D6A0]">
+                        <div class="text-5xl mb-4">📋</div>
+                        <h3 class="text-2xl font-bold mb-2">Format (형식)</h3>
+                        <p class="text-gray-600">'글머리 기호 목록', 'JSON 객체' 등 원하는 결과물의 구조를 명시적으로 정의합니다.</p>
+                    </div>
+                    <div class="card text-center border-t-4 border-[#118AB2]">
+                        <div class="text-5xl mb-4">CONTEXT</div>
+                        <h3 class="text-2xl font-bold mb-2">Task (과제)</h3>
+                        <p class="text-gray-600">작업에 필요한 배경 정보, 데이터, 제약 조건 등 충분한 맥락을 제공하여 답변의 질을 높입니다.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="notebooklm">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-4">당신의 개인 연구 조수, NotebookLM</h2>
+                <p class="text-center max-w-2xl mx-auto text-gray-600 mb-12">정보의 출처가 불분명한 AI는 이제 그만. 사용자가 제공한 자료에만 근거하여 답변하는 'Grounded AI' NotebookLM으로 학문적 정직성을 지키며 연구 효율을 극대화하세요.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="card border-l-4 border-red-500">
+                        <h3 class="text-2xl font-bold mb-4">일반 챗봇 (Ungrounded)</h3>
+                        <ul class="space-y-3 text-gray-600">
+                            <li class="flex items-start"><span class="text-red-500 mr-3 text-xl">✖️</span><span>출처가 불분명한 인터넷 데이터 기반</span></li>
+                            <li class="flex items-start"><span class="text-red-500 mr-3 text-xl">✖️</span><span>'환각 현상'으로 거짓 정보 생성 가능</span></li>
+                            <li class="flex items-start"><span class="text-red-500 mr-3 text-xl">✖️</span><span>학술 연구에 사용 시 신뢰도 문제</span></li>
+                        </ul>
+                    </div>
+                    <div class="card border-l-4 border-green-500">
+                        <h3 class="text-2xl font-bold mb-4">NotebookLM (Grounded)</h3>
+                        <ul class="space-y-3 text-gray-600">
+                            <li class="flex items-start"><span class="text-green-500 mr-3 text-xl">✔️</span><span><b class="text-gray-800">100% 사용자가 제공한 자료</b>에만 근거</span></li>
+                            <li class="flex items-start"><span class="text-green-500 mr-3 text-xl">✔️</span><span>모든 답변에 명확한 <b class="text-gray-800">출처(Citation)</b> 제시</span></li>
+                            <li class="flex items-start"><span class="text-green-500 mr-3 text-xl">✔️</span><span>신뢰할 수 있는 개인 연구 및 글쓰기 파트너</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section id="vibecoding">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-4">아이디어가 코드가 되는 순간, 바이브 코딩</h2>
+                 <p class="text-center max-w-2xl mx-auto text-gray-600 mb-12">tldraw의 'makereal' 기능을 통해 스케치가 실제 작동하는 코드로 변환되는 마법을 경험하세요. AI 시대의 개발자는 '코더'가 아닌, 아이디어를 현실로 만드는 '크리에이티브 디렉터'입니다.</p>
+                <div class="card">
+                    <div class="flex flex-col md:flex-row items-center justify-around text-center p-6 space-y-8 md:space-y-0">
+                        <div class="flex-1">
+                            <h3 class="text-xl font-bold mb-2">1. 스케치</h3>
+                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 h-64 w-64 mx-auto flex flex-col justify-center items-center text-gray-500">
+                                <p class="font-bold mb-2">Login</p>
+                                <div class="w-48 h-8 border border-gray-400 rounded mb-2 flex items-center justify-center text-sm">Username</div>
+                                <div class="w-48 h-8 border border-gray-400 rounded mb-4 flex items-center justify-center text-sm">Password</div>
+                                <div class="w-32 h-10 bg-[#118AB2] rounded flex items-center justify-center text-white">Submit</div>
+                            </div>
+                        </div>
+                        <div class="text-5xl font-light text-[#06D6A0] transform rotate-90 md:rotate-0">→</div>
+                        <div class="flex-1">
+                             <h3 class="text-xl font-bold mb-2">2. AI 변환 (Make it Real)</h3>
+                            <div class="text-8xl text-center animate-pulse">✨</div>
+                        </div>
+                        <div class="text-5xl font-light text-[#06D6A0] transform rotate-90 md:rotate-0">→</div>
+                        <div class="flex-1">
+                            <h3 class="text-xl font-bold mb-2">3. 실제 코드</h3>
+                            <div class="bg-[#073B4C] text-left text-white p-4 rounded-lg font-mono text-xs h-64 w-64 mx-auto overflow-auto">
+<pre>&lt;div class="p-8"&gt;
+  &lt;h2&gt;Login&lt;/h2&gt;
+  &lt;input 
+    type="text" 
+    placeholder="Username"&gt;
+  &lt;input 
+    type="password" 
+    placeholder="Password"&gt;
+  &lt;button&gt;
+    Submit
+  &lt;/button&gt;
+&lt;/div&gt;</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="project">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-4">최종 프로젝트: '캠퍼스 행사 찾기' 앱 제작</h2>
+                <p class="text-center max-w-2xl mx-auto text-gray-600 mb-12">워크숍의 모든 것을 종합하여, AI 코드 편집기 Cursor와 함께 실제 웹 애플리케이션을 처음부터 완성하는 전체 개발 사이클을 경험합니다.</p>
+                <div class="card">
+                    <div class="relative wrap overflow-hidden p-10 h-full">
+                        <div class="border-2-2 absolute border-opacity-20 border-gray-700 h-full border" style="left: 50%"></div>
+                        <div class="mb-8 flex justify-between items-center w-full right-timeline">
+                            <div class="order-1 w-5/12"></div>
+                            <div class="z-20 flex items-center order-1 bg-[#FF6B6B] shadow-xl w-12 h-12 rounded-full">
+                                <h1 class="mx-auto font-black text-white text-lg">1</h1>
+                            </div>
+                            <div class="order-1 bg-white rounded-lg shadow-xl w-5/12 px-6 py-4">
+                                <h3 class="font-bold text-gray-800 text-xl">프로젝트 설정</h3>
+                                <p class="text-sm leading-snug tracking-wide text-gray-600">Vite와 Tailwind CSS로 React 개발 환경을 구축합니다.</p>
+                            </div>
+                        </div>
+
+                        <div class="mb-8 flex justify-between flex-row-reverse items-center w-full left-timeline">
+                            <div class="order-1 w-5/12"></div>
+                             <div class="z-20 flex items-center order-1 bg-[#FFD166] shadow-xl w-12 h-12 rounded-full">
+                                <h1 class="mx-auto text-white font-black text-lg">2</h1>
+                            </div>
+                            <div class="order-1 bg-white rounded-lg shadow-xl w-5/12 px-6 py-4">
+                                <h3 class="font-bold text-gray-800 text-xl">데이터 구조화</h3>
+                                <p class="text-sm leading-snug tracking-wide text-gray-600">useState를 사용해 행사 정보를 담을 모의 데이터를 생성합니다.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-8 flex justify-between items-center w-full right-timeline">
+                            <div class="order-1 w-5/12"></div>
+                            <div class="z-20 flex items-center order-1 bg-[#06D6A0] shadow-xl w-12 h-12 rounded-full">
+                                <h1 class="mx-auto font-black text-white text-lg">3</h1>
+                            </div>
+                            <div class="order-1 bg-white rounded-lg shadow-xl w-5/12 px-6 py-4">
+                                <h3 class="font-bold text-gray-800 text-xl">컴포넌트 제작</h3>
+                                <p class="text-sm leading-snug tracking-wide text-gray-600">개별 행사를 표시할 'EventCard' 컴포넌트를 만듭니다.</p>
+                            </div>
+                        </div>
+
+                        <div class="mb-8 flex justify-between flex-row-reverse items-center w-full left-timeline">
+                            <div class="order-1 w-5/12"></div>
+                            <div class="z-20 flex items-center order-1 bg-[#118AB2] shadow-xl w-12 h-12 rounded-full">
+                                <h1 class="mx-auto text-white font-black text-lg">4</h1>
+                            </div>
+                            <div class="order-1 bg-white rounded-lg shadow-xl w-5/12 px-6 py-4">
+                                <h3 class="font-bold text-gray-800 text-xl">UI 렌더링</h3>
+                                <p class="text-sm leading-snug tracking-wide text-gray-600">데이터를 순회하며 EventCard들을 화면에 표시합니다.</p>
+                            </div>
+                        </div>
+                        <div class="mb-8 flex justify-between items-center w-full right-timeline">
+                            <div class="order-1 w-5/12"></div>
+                            <div class="z-20 flex items-center order-1 bg-[#073B4C] shadow-xl w-12 h-12 rounded-full">
+                                <h1 class="mx-auto font-black text-white text-lg">5</h1>
+                            </div>
+                            <div class="order-1 bg-white rounded-lg shadow-xl w-5/12 px-6 py-4">
+                                <h3 class="font-bold text-gray-800 text-xl">기능 추가 및 디버깅</h3>
+                                <p class="text-sm leading-snug tracking-wide text-gray-600">등록 폼을 만들고, AI와 함께 오류를 해결하며 앱을 완성합니다.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const ctx = document.getElementById('marketChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['ChatGPT', 'Claude', 'Perplexity AI'],
+                    datasets: [
+                        {
+                            label: '시장 점유율 (%)',
+                            data: [60, 3.2, 6.2],
+                            backgroundColor: '#118AB2',
+                            yAxisID: 'y',
+                        },
+                        {
+                            label: '분기별 사용자 성장률 (%)',
+                            data: [8, 14, 10],
+                            backgroundColor: '#06D6A0',
+                            yAxisID: 'y1',
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: '시장 점유율 (%)',
+                                color: '#118AB2'
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: '성장률 (%)',
+                                color: '#06D6A0'
+                            },
+                            grid: {
+                                drawOnChartArea: false,
+                            },
+                        },
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: '2025년 상반기 주요 AI 모델 비교 (추정치)',
+                            font: {
+                                size: 16
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                title: function(tooltipItems) {
+                                    const item = tooltipItems[0];
+                                    let label = item.chart.data.labels[item.dataIndex];
+                                    if (Array.isArray(label)) {
+                                      return label.join(' ');
+                                    } else {
+                                      return label;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+            });
+        });
+    </script>
+</body>
+</html>
